@@ -13,5 +13,8 @@ State initWindow(int winWidth, int winHeight, const char* winTitle, struct Rende
 		return SUCCESS;
 	}
 
+#ifndef NDEBUG
+	fprintf(stderr, "[Error] creating glfw window.\n");
+#endif
 	return ERROR_GLFW_WINDOW_CREATION;
 }

@@ -15,6 +15,9 @@ struct Renderer {
 
 	// Vulkan handles
 	VkInstance vkInstance;
+#ifndef NDEBUG
+	VkDebugUtilsMessengerEXT debugMessenger;
+#endif
 };
 
 State initRenderer(struct Renderer* renderer);

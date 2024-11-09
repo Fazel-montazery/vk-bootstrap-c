@@ -3,10 +3,8 @@
 #include "debug.h"
 
 #ifndef NDEBUG
-static const uint32_t validationLayerCount = 1;
-static const char* validationLayers[] = {
-	"VK_LAYER_KHRONOS_validation"
-};
+extern const uint32_t validationLayerCount;
+extern const char* validationLayers[];
 #endif
 
 static bool checkExtensionsSupport(const char** requiredExtensionsVec)

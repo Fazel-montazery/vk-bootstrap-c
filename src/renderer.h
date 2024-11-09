@@ -2,6 +2,8 @@
 
 #include "config.h"
 
+#include "queue.h"
+
 #define CHECK_STATE(state) do {         \
         if (state != SUCCESS)           \
                 return state;           \
@@ -19,6 +21,11 @@ struct Renderer {
 	VkDebugUtilsMessengerEXT debugMessenger;
 #endif
 	VkPhysicalDevice vkPhysicalDevice;
+	VkDevice vkDevice;
+	VkQueue vkGraphicsQueue;
+
+	// Useful data
+	struct QueueFamilyIndices queueIndices;
 };
 
 State initRenderer(struct Renderer* renderer);

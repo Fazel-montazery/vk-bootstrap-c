@@ -31,6 +31,10 @@ State initRenderer(struct Renderer* renderer)
 	state = pickPhysicalDevice(&r);
 	CHECK_STATE(state);
 
+	// Creating a logical device from the selected physical device
+	state = createLogicalDevice(&r);
+	CHECK_STATE(state);
+
 	*renderer = r;
 	return state;
 }
@@ -49,6 +53,7 @@ void destroyRenderer(struct Renderer* renderer)
 #ifndef NDEBUG
 	destroyDebugMessenger(renderer);
 #endif
+	vkDestroyDevice(r.vkDevice, NULL);
 	vkDestroyInstance(r.vkInstance, NULL);
 	glfwDestroyWindow(r.window);
 	glfwTerminate();

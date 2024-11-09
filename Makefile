@@ -8,7 +8,7 @@ target := bin/main.out
 all: main
 
 main: ${src}
-	${CC} -o ${target} ${includes} ${src} src/debug.c ${libs} ${flags}
+	${CC} -o ${target} ${includes} ${src} src/debug.c src/validation_layers.c ${libs} ${flags}
 
 release: ${src}
 	${CC} -o ${target} ${includes} ${src} ${libs} -O2 -DNDEBUG

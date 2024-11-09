@@ -1,5 +1,14 @@
 #include "window.h"
 
+void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) 
+{
+    if (action == GLFW_PRESS) {
+        if (key == GLFW_KEY_ESCAPE || key == GLFW_KEY_Q) {
+            glfwSetWindowShouldClose(window, true);
+        }
+    }
+}
+
 State initWindow(int winWidth, int winHeight, const char* winTitle, struct Renderer* renderer)
 {
 	glfwInit();
@@ -10,6 +19,7 @@ State initWindow(int winWidth, int winHeight, const char* winTitle, struct Rende
 	if((renderer->window = glfwCreateWindow(winWidth, winHeight, winTitle, NULL, NULL))) {
 		renderer->winWidth = winWidth;
 		renderer->winHeight = winHeight;
+		glfwSetKeyCallback(renderer->window, keyCallback);
 		return SUCCESS;
 	}
 

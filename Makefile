@@ -1,4 +1,4 @@
-src := src/main.c src/renderer.c src/window.c src/instance.c src/device.c
+src := src/main.c src/renderer.c src/window.c src/instance.c src/device.c src/queue.c
 includes := include/c_vector/vec.c
 libs := -lglfw -lvulkan -ldl -lpthread -lX11 -lXxf86vm -lXrandr -lXi
 CC := gcc

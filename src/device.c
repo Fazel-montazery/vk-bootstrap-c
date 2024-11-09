@@ -1,7 +1,14 @@
 #include "device.h"
 
+#include "queue.h"
+
 static int getDeviceScore(VkPhysicalDevice device) 
 {
+	struct QueueFamilyIndices indices = findQueueFamilies(device);
+	if (!indices.graphicsFamilyExists) {
+		return -1;
+	}
+
 	int score = 0;
 	VkPhysicalDeviceProperties deviceProperties;
 	vkGetPhysicalDeviceProperties(device, &deviceProperties);

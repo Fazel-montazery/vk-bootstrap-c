@@ -2,6 +2,7 @@
 
 #include "window.h"
 #include "instance.h"
+#include "device.h"
 
 #ifndef NDEBUG
 #include "debug.h"
@@ -25,6 +26,10 @@ State initRenderer(struct Renderer* renderer)
 	state = initDebugMessenger(&r);
 	CHECK_STATE(state);
 #endif
+
+	// PickingUp a GPU
+	state = pickPhysicalDevice(&r);
+	CHECK_STATE(state);
 
 	*renderer = r;
 	return state;

@@ -18,6 +18,7 @@ struct Renderer {
 #ifndef NDEBUG
 	VkDebugUtilsMessengerEXT debugMessenger;
 #endif
+	VkPhysicalDevice vkPhysicalDevice;
 };
 
 State initRenderer(struct Renderer* renderer);

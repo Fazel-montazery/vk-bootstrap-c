@@ -1,4 +1,4 @@
-src := src/main.c src/renderer.c src/window.c src/instance.c src/debug.c
+src := src/main.c src/renderer.c src/window.c src/instance.c src/device.c
 includes := include/c_vector/vec.c
 libs := -lglfw -lvulkan -ldl -lpthread -lX11 -lXxf86vm -lXrandr -lXi
 CC := gcc
@@ -8,7 +8,7 @@ target := bin/main.out
 all: main
 
 main: ${src}
-	${CC} -o ${target} ${includes} ${src} ${libs} ${flags}
+	${CC} -o ${target} ${includes} ${src} src/debug.c ${libs} ${flags}
 
 release: ${src}
 	${CC} -o ${target} ${includes} ${src} ${libs} -O2 -DNDEBUG

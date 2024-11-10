@@ -26,6 +26,11 @@ struct Renderer {
 	VkQueue vkGraphicsQueue;
 	VkQueue vkPresentQueue;
 
+	VkSwapchainKHR vkSwapChain;
+	VkImage* vkSwapChainImagesVec;
+	VkFormat vkSwapChainImageFormat;
+	VkExtent2D vkSwapChainExtent;
+
 	// Useful data
 	struct QueueFamilyIndices queueIndices;
 };

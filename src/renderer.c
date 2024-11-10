@@ -4,6 +4,7 @@
 #include "instance.h"
 #include "surface.h"
 #include "device.h"
+#include "swap_chain.h"
 
 #ifndef NDEBUG
 #include "debug.h"
@@ -40,6 +41,10 @@ State initRenderer(struct Renderer* renderer)
 	state = createLogicalDevice(&r);
 	CHECK_STATE(state);
 
+	// Creating the swapchain
+	state = createSwapChain(&r);
+	CHECK_STATE(state);
+
 	*renderer = r;
 	return state;
 }
@@ -58,6 +63,8 @@ void destroyRenderer(struct Renderer* renderer)
 #ifndef NDEBUG
 	destroyDebugMessenger(renderer);
 #endif
+	vector_free(r.vkSwapChainImagesVec);
+	vkDestroySwapchainKHR(r.vkDevice, r.vkSwapChain, NULL);
 	vkDestroyDevice(r.vkDevice, NULL);
 	vkDestroySurfaceKHR(r.vkInstance, r.vkSurface, NULL);
 	vkDestroyInstance(r.vkInstance, NULL);

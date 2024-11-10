@@ -33,13 +33,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vec.h"
 #include <string.h>
 
-typedef struct
-{
-	vec_size_t size;
-	vec_size_t capacity;
-	unsigned char data[]; 
-} vector_header;
-
 vector_header* vector_get_header(vector vec) { return &((vector_header*)vec)[-1]; }
 
 bool _vector_contains(vector vec, vec_type_t type_size, const void* value, bool (*cmp)(const void*, const void*)) {

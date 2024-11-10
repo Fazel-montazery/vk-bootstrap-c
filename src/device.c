@@ -3,16 +3,66 @@
 #include "queue.h"
 
 #include "instance.h"
+#include "swap_chain.h"
 
 #ifndef NDEBUG
 extern const uint32_t validationLayerCount;
 extern const char* validationLayers[];
 #endif
 
+static const uint32_t deviceExtensionCount = 1;
+static const char* deviceExtensions[] = {
+	VK_KHR_SWAPCHAIN_EXTENSION_NAME,
+};
+
+static bool checkDeviceExtensionSupport(VkPhysicalDevice device) 
+{
+	uint32_t extensionCount;
+	vkEnumerateDeviceExtensionProperties(device, NULL, &extensionCount, NULL);
+
+	VkExtensionProperties* availableExtensionsVec = vector_create();
+	vector_reserve(&availableExtensionsVec, extensionCount);
+	vkEnumerateDeviceExtensionProperties(device, NULL, &extensionCount, availableExtensionsVec);
+
+	for (uint32_t i = 0; i < deviceExtensionCount; i++) {
+		bool found = false;
+		for (uint32_t j = 0; j < extensionCount; j++) {
+			if (strcmp(deviceExtensions[i], availableExtensionsVec[j].extensionName) == 0) {
+				found = true;
+				break;
+			}
+		}
+
+		if (!found) {
+#ifndef NDEBUG
+			fprintf(stderr, "[Error] Not supporting [%s] extension!\n", deviceExtensions[i]);
+#endif
+			vector_free(availableExtensionsVec);
+			return false;
+		}
+	}
+
+	vector_free(availableExtensionsVec);
+	return true;
+}
+
 static int getDeviceScore(VkPhysicalDevice device, VkSurfaceKHR surface)
 {
 	struct QueueFamilyIndices indices = findQueueFamilies(device, surface);
 	if (!indices.graphicsFamilyExists || !indices.presentFamilyExists) {
+		return -1;
+	}
+
+	if (!checkDeviceExtensionSupport(device)) {
+		return -1;
+	}
+
+	bool swapChainAdequate = false;
+	struct SwapChainSupportDetails swapChainSupport = querySwapChainSupport(device, surface);
+    	swapChainAdequate = vector_size(swapChainSupport.formatsVec) && vector_size(swapChainSupport.presentModesVec);
+	destroySwapChainSupportDetails(&swapChainSupport);
+
+	if (!swapChainAdequate) {
 		return -1;
 	}
 
@@ -104,7 +154,8 @@ State createLogicalDevice(struct Renderer* renderer)
 	createInfo.pQueueCreateInfos = queueCreateInfosVec;
 	createInfo.pEnabledFeatures = &deviceFeatures;
 
-	createInfo.enabledExtensionCount = 0;
+	createInfo.enabledExtensionCount = deviceExtensionCount;
+	createInfo.ppEnabledExtensionNames = deviceExtensions;
 
 #ifndef NDEBUG
     		createInfo.enabledLayerCount = validationLayerCount;

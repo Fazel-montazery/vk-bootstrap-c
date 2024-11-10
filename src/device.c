@@ -9,10 +9,10 @@ extern const uint32_t validationLayerCount;
 extern const char* validationLayers[];
 #endif
 
-static int getDeviceScore(VkPhysicalDevice device) 
+static int getDeviceScore(VkPhysicalDevice device, VkSurfaceKHR surface)
 {
-	struct QueueFamilyIndices indices = findQueueFamilies(device);
-	if (!indices.graphicsFamilyExists) {
+	struct QueueFamilyIndices indices = findQueueFamilies(device, surface);
+	if (!indices.graphicsFamilyExists || !indices.presentFamilyExists) {
 		return -1;
 	}
 
@@ -27,6 +27,11 @@ static int getDeviceScore(VkPhysicalDevice device)
 	score += deviceProperties.limits.maxImageDimension2D;
 
 	return score;
+}
+
+static bool cmpIndex(const void* a, const void* b)
+{
+	return *((uint32_t*) a) == *((uint32_t*) b);
 }
 
 State pickPhysicalDevice(struct Renderer* renderer)
@@ -50,7 +55,7 @@ State pickPhysicalDevice(struct Renderer* renderer)
 	int deviceScore = -1;
 	VkPhysicalDevice tmpDevice = VK_NULL_HANDLE;
 	for (uint32_t i = 0; i < deviceCount; i++) {
-		int tmpScore = getDeviceScore(devicesVec[i]);
+		int tmpScore = getDeviceScore(devicesVec[i], renderer->vkSurface);
 		if (tmpScore > deviceScore) {
 			tmpDevice = devicesVec[i];
 			deviceScore = tmpScore;
@@ -66,7 +71,7 @@ State pickPhysicalDevice(struct Renderer* renderer)
 	}
 
 	renderer->vkPhysicalDevice = tmpDevice;
-	renderer->queueIndices = findQueueFamilies(tmpDevice);
+	renderer->queueIndices = findQueueFamilies(tmpDevice, renderer->vkSurface);
 
 	vector_free(devicesVec);
 	return SUCCESS;
@@ -76,19 +81,27 @@ State createLogicalDevice(struct Renderer* renderer)
 {
 	struct QueueFamilyIndices indices = renderer->queueIndices;
 
-	VkDeviceQueueCreateInfo queueCreateInfo = {0};
-	queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-	queueCreateInfo.queueFamilyIndex = indices.graphicsFamily;
-	queueCreateInfo.queueCount = 1;
+	VkDeviceQueueCreateInfo* queueCreateInfosVec = vector_create();
+	uint32_t* uniqueQueueFamiliesSet = vector_create();
+	vector_add_unique(&uniqueQueueFamiliesSet, indices.graphicsFamily, cmpIndex);
+	vector_add_unique(&uniqueQueueFamiliesSet, indices.presentFamily, cmpIndex);
+
 	float queuePriority = 1.0f;
-	queueCreateInfo.pQueuePriorities = &queuePriority;
+	for (int i = 0; i < vector_size(uniqueQueueFamiliesSet); i++) {
+		VkDeviceQueueCreateInfo queueCreateInfo = {0};
+		queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+		queueCreateInfo.queueFamilyIndex = uniqueQueueFamiliesSet[i];
+		queueCreateInfo.queueCount = 1;
+		queueCreateInfo.pQueuePriorities = &queuePriority;
+		vector_add(&queueCreateInfosVec, queueCreateInfo);
+	}
 
 	VkPhysicalDeviceFeatures deviceFeatures = {0};
 
 	VkDeviceCreateInfo createInfo = {0};
 	createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-	createInfo.pQueueCreateInfos = &queueCreateInfo;
-	createInfo.queueCreateInfoCount = 1;
+	createInfo.queueCreateInfoCount = (uint32_t) vector_size(queueCreateInfosVec);
+	createInfo.pQueueCreateInfos = queueCreateInfosVec;
 	createInfo.pEnabledFeatures = &deviceFeatures;
 
 	createInfo.enabledExtensionCount = 0;
@@ -108,6 +121,9 @@ State createLogicalDevice(struct Renderer* renderer)
 	}
 
 	vkGetDeviceQueue(renderer->vkDevice, indices.graphicsFamily, 0, &renderer->vkGraphicsQueue);
+	vkGetDeviceQueue(renderer->vkDevice, indices.presentFamily, 0, &renderer->vkPresentQueue);
 	
+	vector_free(queueCreateInfosVec);
+	vector_free(uniqueQueueFamiliesSet);
 	return SUCCESS;
 }

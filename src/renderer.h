@@ -24,6 +24,7 @@ struct Renderer {
 	VkPhysicalDevice vkPhysicalDevice;
 	VkDevice vkDevice;
 	VkQueue vkGraphicsQueue;
+	VkQueue vkPresentQueue;
 
 	// Useful data
 	struct QueueFamilyIndices queueIndices;

@@ -20,6 +20,7 @@ struct Renderer {
 #ifndef NDEBUG
 	VkDebugUtilsMessengerEXT debugMessenger;
 #endif
+	VkSurfaceKHR vkSurface;
 	VkPhysicalDevice vkPhysicalDevice;
 	VkDevice vkDevice;
 	VkQueue vkGraphicsQueue;

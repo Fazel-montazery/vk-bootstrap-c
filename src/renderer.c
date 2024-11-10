@@ -2,6 +2,7 @@
 
 #include "window.h"
 #include "instance.h"
+#include "surface.h"
 #include "device.h"
 
 #ifndef NDEBUG
@@ -26,6 +27,10 @@ State initRenderer(struct Renderer* renderer)
 	state = initDebugMessenger(&r);
 	CHECK_STATE(state);
 #endif
+
+	// Create a window surface
+	state = createSurface(&r);
+	CHECK_STATE(state);
 
 	// PickingUp a GPU
 	state = pickPhysicalDevice(&r);
@@ -54,6 +59,7 @@ void destroyRenderer(struct Renderer* renderer)
 	destroyDebugMessenger(renderer);
 #endif
 	vkDestroyDevice(r.vkDevice, NULL);
+	vkDestroySurfaceKHR(r.vkInstance, r.vkSurface, NULL);
 	vkDestroyInstance(r.vkInstance, NULL);
 	glfwDestroyWindow(r.window);
 	glfwTerminate();

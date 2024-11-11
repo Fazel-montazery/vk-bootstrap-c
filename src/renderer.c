@@ -45,6 +45,10 @@ State initRenderer(struct Renderer* renderer)
 	state = createSwapChain(&r);
 	CHECK_STATE(state);
 
+	// Creating imageViews
+	state = createImageViews(&r);
+	CHECK_STATE(state);
+
 	*renderer = r;
 	return state;
 }
@@ -63,6 +67,10 @@ void destroyRenderer(struct Renderer* renderer)
 #ifndef NDEBUG
 	destroyDebugMessenger(renderer);
 #endif
+	for (int i = 0; i < vector_size(r.vkSwapChainImageViewsVec); i++) {
+		vkDestroyImageView(r.vkDevice, r.vkSwapChainImageViewsVec[i], NULL);
+	}
+	vector_free(r.vkSwapChainImageViewsVec);
 	vector_free(r.vkSwapChainImagesVec);
 	vkDestroySwapchainKHR(r.vkDevice, r.vkSwapChain, NULL);
 	vkDestroyDevice(r.vkDevice, NULL);

@@ -148,3 +148,39 @@ State createSwapChain(struct Renderer* renderer)
 	destroySwapChainSupportDetails(&swapChainSupport);
 	return SUCCESS;
 }
+
+State createImageViews(struct Renderer* renderer)
+{
+	VkImageView* swapChainImageViewsVec = vector_create();
+	int size = vector_size(renderer->vkSwapChainImagesVec);
+	vector_reserve(&swapChainImageViewsVec, size);
+	vector_get_header(swapChainImageViewsVec)->size = size;
+
+	for (int i = 0; i < size; i++) {
+		VkImageViewCreateInfo createInfo = {0};
+		createInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+		createInfo.image = renderer->vkSwapChainImagesVec[i];
+		createInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
+		createInfo.format = renderer->vkSwapChainImageFormat;
+		createInfo.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;
+		createInfo.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
+		createInfo.components.b = VK_COMPONENT_SWIZZLE_IDENTITY;
+		createInfo.components.a = VK_COMPONENT_SWIZZLE_IDENTITY;
+		createInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+		createInfo.subresourceRange.baseMipLevel = 0;
+		createInfo.subresourceRange.levelCount = 1;
+		createInfo.subresourceRange.baseArrayLayer = 0;
+		createInfo.subresourceRange.layerCount = 1;
+		if (vkCreateImageView(renderer->vkDevice, &createInfo, NULL, &swapChainImageViewsVec[i]) != VK_SUCCESS) {
+#ifndef NDEBUG
+			fprintf(stderr, "[Error] failed to create image views!\n");
+#endif
+			vector_free(swapChainImageViewsVec);
+			return ERROR_VULKAN_IMAGE_VIEW_CREATION;
+		}
+	}
+
+	renderer->vkSwapChainImageViewsVec = swapChainImageViewsVec;
+
+	return SUCCESS;
+}

@@ -13,3 +13,4 @@ struct SwapChainSupportDetails {
 struct SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device, VkSurfaceKHR surface);
 void destroySwapChainSupportDetails(struct SwapChainSupportDetails* details);
 State createSwapChain(struct Renderer* renderer);
+State createImageViews(struct Renderer* renderer);

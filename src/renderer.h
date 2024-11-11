@@ -28,6 +28,7 @@ struct Renderer {
 
 	VkSwapchainKHR vkSwapChain;
 	VkImage* vkSwapChainImagesVec;
+	VkImageView* vkSwapChainImageViewsVec;
 	VkFormat vkSwapChainImageFormat;
 	VkExtent2D vkSwapChainExtent;
 

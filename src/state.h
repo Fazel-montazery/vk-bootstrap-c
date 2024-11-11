@@ -1,5 +1,7 @@
 #pragma once
 
+#include <stdio.h>
+
 typedef enum {
 	SUCCESS = 0,
 	FAIL,
@@ -15,3 +17,12 @@ typedef enum {
 	ERROR_VULKAN_SWAPCHAIN_CREATION,
 	ERROR_VULKAN_IMAGE_VIEW_CREATION
 } State;
+
+void printState(State s);
+
+#define CHECK_STATE(state) do {         \
+        if (state != SUCCESS) {         \
+                printState(state);      \
+                return state;           \
+        }                               \
+} while(0)

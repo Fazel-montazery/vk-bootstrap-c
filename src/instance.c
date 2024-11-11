@@ -103,16 +103,12 @@ State createVulkanInstance(const char* appName, struct Renderer* renderer)
 #endif
 
 	if (!checkExtensionsSupport(requiredExtensionsVec)) {
-#ifndef NDEBUG
-		fprintf(stderr, "[Error] required extensions not supported.\n");
-#endif
 		vector_free(requiredExtensionsVec);
 		return ERROR_VULKAN_EXTENSIONS_NOT_SUPPORTED;
 	}
 
 #ifndef NDEBUG
 	if (!checkValidationLayersSupport()) {
-		fprintf(stderr, "[Error] required validation layers not supported.\n");
 		return ERROR_VULKAN_VALIDATION_LAYERS_NOT_SUPPORTED;
 	}
 #endif
@@ -140,9 +136,6 @@ State createVulkanInstance(const char* appName, struct Renderer* renderer)
 	createInfo.ppEnabledExtensionNames = requiredExtensionsVec;
 
 	if (vkCreateInstance(&createInfo, NULL, &renderer->vkInstance) != VK_SUCCESS) {
-#ifndef NDEBUG
-		fprintf(stderr, "[Error] Creating vulkan Instance.\n");
-#endif
 		vector_free(requiredExtensionsVec);
 		return ERROR_VULKAN_INSTANCE_CREATION;
 	}

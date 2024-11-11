@@ -47,7 +47,6 @@ State initDebugMessenger(struct Renderer* renderer)
 	populateDebugMessengerCreateInfo(&createInfo);
 
 	if (CreateDebugUtilsMessengerEXT(renderer->vkInstance, &createInfo, NULL, &renderer->debugMessenger) != VK_SUCCESS) {
-		fprintf(stderr, "[Error] failed to set up debug messenger.\n");
 		return ERROR_VULKAN_ERROR_CALLBACK_CREATION;
 	}
 

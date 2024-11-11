@@ -4,10 +4,10 @@ int main(int argc, char** argv)
 {
 	struct Renderer myRenderer;
 	if (initRenderer(&myRenderer) != SUCCESS)
-		return -1;
+		return FAIL;
 
 	runRenderer(myRenderer);
 	
 	destroyRenderer(&myRenderer);
-	return 0;
+	return SUCCESS;
 }

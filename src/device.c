@@ -89,9 +89,6 @@ State pickPhysicalDevice(struct Renderer* renderer)
 	uint32_t deviceCount = 0;
 	vkEnumeratePhysicalDevices(renderer->vkInstance, &deviceCount, NULL);
 	if (deviceCount == 0) {
-#ifndef NDEBUG
-		fprintf(stderr, "failed to find GPUs with Vulkan support!\n");
-#endif
 		return ERROR_VULKAN_NO_PHYSICAL_DEVICE_SUPPORTED;
 	}
 
@@ -113,9 +110,6 @@ State pickPhysicalDevice(struct Renderer* renderer)
 	}
 
 	if (deviceScore == -1) {
-#ifndef NDEBUG
-		fprintf(stderr, "failed to find a suitable GPU!\n");
-#endif
 		vector_free(devicesVec);
 		return ERROR_VULKAN_NO_SUITABLE_GPU;
 	}
@@ -165,9 +159,6 @@ State createLogicalDevice(struct Renderer* renderer)
 #endif
 
 	if (vkCreateDevice(renderer->vkPhysicalDevice, &createInfo, NULL, &renderer->vkDevice) != VK_SUCCESS) {
-#ifndef NDEBUG
-		fprintf(stderr, "failed to create logical device!\n");
-#endif
 		return ERROR_VULKAN_LOGICAL_DEVICE_CREATION;
 	}
 

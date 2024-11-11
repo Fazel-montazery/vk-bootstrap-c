@@ -129,9 +129,6 @@ State createSwapChain(struct Renderer* renderer)
 	createInfo.oldSwapchain = VK_NULL_HANDLE;
 
 	if (vkCreateSwapchainKHR(renderer->vkDevice, &createInfo, NULL, &renderer->vkSwapChain) != VK_SUCCESS) {
-#ifndef NDEBUG
-		fprintf(stderr, "[Error] failed to create swap chain!\n");
-#endif
 		destroySwapChainSupportDetails(&swapChainSupport);
 		return ERROR_VULKAN_SWAPCHAIN_CREATION;
 	}
@@ -172,9 +169,6 @@ State createImageViews(struct Renderer* renderer)
 		createInfo.subresourceRange.baseArrayLayer = 0;
 		createInfo.subresourceRange.layerCount = 1;
 		if (vkCreateImageView(renderer->vkDevice, &createInfo, NULL, &swapChainImageViewsVec[i]) != VK_SUCCESS) {
-#ifndef NDEBUG
-			fprintf(stderr, "[Error] failed to create image views!\n");
-#endif
 			vector_free(swapChainImageViewsVec);
 			return ERROR_VULKAN_IMAGE_VIEW_CREATION;
 		}

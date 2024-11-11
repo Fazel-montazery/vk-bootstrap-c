@@ -4,11 +4,6 @@
 
 #include "queue.h"
 
-#define CHECK_STATE(state) do {         \
-        if (state != SUCCESS)           \
-                return state;           \
-} while(0)
-
 struct Renderer {
 	// Windowing
 	GLFWwindow* window;

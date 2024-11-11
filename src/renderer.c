@@ -5,6 +5,7 @@
 #include "surface.h"
 #include "device.h"
 #include "swap_chain.h"
+#include "graphics_pipeline.h"
 
 #ifndef NDEBUG
 #include "debug.h"
@@ -49,6 +50,14 @@ State initRenderer(struct Renderer* renderer)
 	state = createImageViews(&r);
 	CHECK_STATE(state);
 
+	// Creating the renderpass
+	state = createRenderPass(&r);
+	CHECK_STATE(state);
+
+	// Creating the initial graphics pipeline
+	state = createGraphicsPipeline(&r);
+	CHECK_STATE(state);
+
 	*renderer = r;
 	return state;
 }
@@ -67,6 +76,9 @@ void destroyRenderer(struct Renderer* renderer)
 #ifndef NDEBUG
 	destroyDebugMessenger(renderer);
 #endif
+	vkDestroyPipeline(r.vkDevice, r.vkGraphicsPipeline, NULL);
+	vkDestroyPipelineLayout(r.vkDevice, r.vkPipelineLayout, NULL);
+	vkDestroyRenderPass(r.vkDevice, r.vkRenderPass, NULL);
 	for (int i = 0; i < vector_size(r.vkSwapChainImageViewsVec); i++) {
 		vkDestroyImageView(r.vkDevice, r.vkSwapChainImageViewsVec[i], NULL);
 	}

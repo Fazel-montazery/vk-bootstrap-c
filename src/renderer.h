@@ -27,6 +27,10 @@ struct Renderer {
 	VkFormat vkSwapChainImageFormat;
 	VkExtent2D vkSwapChainExtent;
 
+	VkRenderPass vkRenderPass;
+	VkPipelineLayout vkPipelineLayout;
+	VkPipeline vkGraphicsPipeline;
+
 	// Useful data
 	struct QueueFamilyIndices queueIndices;
 };

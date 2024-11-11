@@ -1,14 +1,14 @@
-src := src/main.c src/state.c src/renderer.c src/window.c src/instance.c src/device.c src/queue.c src/surface.c src/swap_chain.c
+src := src/main.c src/state.c src/utils.c src/renderer.c src/window.c src/instance.c src/device.c src/queue.c src/surface.c src/swap_chain.c src/graphics_pipeline.c
 includes := include/c_vector/vec.c
 libs := -lglfw -lvulkan -ldl -lpthread -lX11 -lXxf86vm -lXrandr -lXi
 CC := gcc
-flags := -O2 -Wall
+flags := -Wall -Wunused
 target := bin/main.out
 
 all: main
 
 main: ${src}
-	${CC} -o ${target} ${includes} ${src} src/debug.c src/validation_layers.c ${libs} ${flags}
+	${CC} -o ${target} ${includes} ${src} src/debug.c src/validation_layers.c ${libs} ${flags} -Os -g
 
 release: ${src}
 	${CC} -o ${target} ${includes} ${src} ${libs} -O2 -DNDEBUG

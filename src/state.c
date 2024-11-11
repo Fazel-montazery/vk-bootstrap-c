@@ -55,6 +55,26 @@ void printState(State s)
 		fprintf(stderr, "[Error] failed to create image views!\n");
 		break;
 
+	case ERROR_VULKAN_SHADER_SRC_LOADING:
+		fprintf(stderr, "[Error] failed to load shader src!\n");
+		break;
+
+	case ERROR_VULKAN_SHADER_MODULE_CREATION:
+		fprintf(stderr, "[Error] failed to create shader module!\n");
+		break;
+
+	case ERROR_VULKAN_RENDERPASS_CREATION:
+		fprintf(stderr, "[Error] failed to create render pass!\n");
+		break;
+
+	case ERROR_VULKAN_PIPELINE_LAYOUT_CREATION:
+		fprintf(stderr, "[Error] failed to create pipeline layout!\n");
+		break;
+
+	case ERROR_VULKAN_GRAPHICS_PIPELINE_CREATION:
+		fprintf(stderr, "[Error] failed to create graphics pipeline!\n");
+		break;
+
 	default:
 		fprintf(stderr, "Unknown state!\n");
 	}

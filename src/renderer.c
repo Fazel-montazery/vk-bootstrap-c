@@ -68,6 +68,10 @@ State initRenderer(struct Renderer* renderer)
 	state = createCommandPool(&r);
 	CHECK_STATE(state);
 
+	// Creating the command pool
+	state = createCommandBuffer(&r);
+	CHECK_STATE(state);
+
 	*renderer = r;
 	return state;
 }

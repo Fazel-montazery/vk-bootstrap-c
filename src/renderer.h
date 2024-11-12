@@ -33,6 +33,7 @@ struct Renderer {
 	VkPipeline vkGraphicsPipeline;
 
 	VkCommandPool vkCommandPool;
+	VkCommandBuffer vkCommandBuffer;
 
 	// Useful data
 	struct QueueFamilyIndices queueIndices;

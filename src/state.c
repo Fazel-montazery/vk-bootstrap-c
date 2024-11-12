@@ -83,6 +83,18 @@ void printState(State s)
 		fprintf(stderr, "[Error] failed to create command pool!\n");
 		break;
 	
+	case ERROR_VULKAN_COMMAND_BUFFER_CREATION:
+		fprintf(stderr, "[Error] failed to create command buffer!\n");
+		break;
+
+	case ERROR_VULKAN_BEGIN_COMMAND_RECORD:
+		fprintf(stderr, "[Error] failed to begin recording command buffer!\n");
+		break;
+
+	case ERROR_VULKAN_COMMAND_BUFFER_RECORD:
+		fprintf(stderr, "[Error] failed to record command buffer!\n");
+		break;
+
 	default:
 		fprintf(stderr, "Unknown state!\n");
 	}

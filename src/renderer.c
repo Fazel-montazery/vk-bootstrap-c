@@ -8,6 +8,7 @@
 #include "graphics_pipeline.h"
 #include "framebuffer.h"
 #include "command.h"
+#include "sync.h"
 
 #ifndef NDEBUG
 #include "debug.h"
@@ -68,19 +69,26 @@ State initRenderer(struct Renderer* renderer)
 	state = createCommandPool(&r);
 	CHECK_STATE(state);
 
-	// Creating the command pool
+	// Creating the command buffer
 	state = createCommandBuffer(&r);
+	CHECK_STATE(state);
+
+	// Creating the command buffer
+	state = createSyncObjects(&r);
 	CHECK_STATE(state);
 
 	*renderer = r;
 	return state;
 }
 
-void runRenderer(struct Renderer renderer)
+void runRenderer(struct Renderer* renderer)
 {
-	while(!glfwWindowShouldClose(renderer.window)) {
+	while(!glfwWindowShouldClose(renderer->window)) {
 		glfwPollEvents();
+		drawFrame(renderer);
 	}
+
+	vkDeviceWaitIdle(renderer->vkDevice);
 }
 
 void destroyRenderer(struct Renderer* renderer)
@@ -90,6 +98,10 @@ void destroyRenderer(struct Renderer* renderer)
 #ifndef NDEBUG
 	destroyDebugMessenger(renderer);
 #endif
+
+	vkDestroySemaphore(r.vkDevice, r.vkImageAvailableSemaphore, NULL);
+	vkDestroySemaphore(r.vkDevice, r.vkRenderFinishedSemaphore, NULL);
+	vkDestroyFence(r.vkDevice, r.vkInFlightFence, NULL);
 
 	vkDestroyCommandPool(r.vkDevice, r.vkCommandPool, NULL);
 

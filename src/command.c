@@ -74,9 +74,57 @@ State recordCommandBuffer(struct Renderer* renderer, VkCommandBuffer commandBuff
 
 	vkCmdDraw(commandBuffer, 3, 1, 0, 0);
 
+	vkCmdEndRenderPass(commandBuffer);
+
 	if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS) {
 		return ERROR_VULKAN_COMMAND_BUFFER_RECORD;
 	}
+
+	return SUCCESS;
+}
+
+State drawFrame(struct Renderer* r)
+{
+	vkWaitForFences(r->vkDevice, 1, &r->vkInFlightFence, VK_TRUE, UINT64_MAX);
+	vkResetFences(r->vkDevice, 1, &r->vkInFlightFence);
+
+	uint32_t imageIndex;
+	vkAcquireNextImageKHR(r->vkDevice, r->vkSwapChain, UINT64_MAX, r->vkImageAvailableSemaphore, VK_NULL_HANDLE, &imageIndex);
+
+	vkResetCommandBuffer(r->vkCommandBuffer, 0);
+	recordCommandBuffer(r, r->vkCommandBuffer, imageIndex);
+
+	VkSubmitInfo submitInfo = {0};
+	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+
+	VkSemaphore waitSemaphores[] = { r->vkImageAvailableSemaphore };
+	VkPipelineStageFlags waitStages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
+	submitInfo.waitSemaphoreCount = 1;
+	submitInfo.pWaitSemaphores = waitSemaphores;
+	submitInfo.pWaitDstStageMask = waitStages;
+	submitInfo.commandBufferCount = 1;
+	submitInfo.pCommandBuffers = &r->vkCommandBuffer;
+
+	VkSemaphore signalSemaphores[] = { r->vkRenderFinishedSemaphore };
+	submitInfo.signalSemaphoreCount = 1;
+	submitInfo.pSignalSemaphores = signalSemaphores;
+
+	if (vkQueueSubmit(r->vkGraphicsQueue, 1, &submitInfo, r->vkInFlightFence) != VK_SUCCESS) {
+		return ERROR_VULKAN_DRAW_COMMAND_SUBMIT;
+	}
+
+	VkPresentInfoKHR presentInfo = {0};
+	presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+
+	presentInfo.waitSemaphoreCount = 1;
+	presentInfo.pWaitSemaphores = signalSemaphores;
+
+	VkSwapchainKHR swapChains[] = { r->vkSwapChain };
+	presentInfo.swapchainCount = 1;
+	presentInfo.pSwapchains = swapChains;
+	presentInfo.pImageIndices = &imageIndex;
+
+	vkQueuePresentKHR(r->vkPresentQueue, &presentInfo);
 
 	return SUCCESS;
 }

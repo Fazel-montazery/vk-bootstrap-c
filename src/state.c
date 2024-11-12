@@ -95,6 +95,14 @@ void printState(State s)
 		fprintf(stderr, "[Error] failed to record command buffer!\n");
 		break;
 
+	case ERROR_VULKAN_SYNC_OBJECTS_CREATION:
+		fprintf(stderr, "[Error] failed to create semaphores or fences!\n");
+		break;
+
+	case ERROR_VULKAN_DRAW_COMMAND_SUBMIT:
+		fprintf(stderr, "[Error] failed to submit draw command buffer!\n");
+		break;
+
 	default:
 		fprintf(stderr, "Unknown state!\n");
 	}

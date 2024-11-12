@@ -6,7 +6,7 @@ int main(int argc, char** argv)
 	if (initRenderer(&myRenderer) != SUCCESS)
 		return FAIL;
 
-	runRenderer(myRenderer);
+	runRenderer(&myRenderer);
 	
 	destroyRenderer(&myRenderer);
 	return SUCCESS;

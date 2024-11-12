@@ -35,10 +35,14 @@ struct Renderer {
 	VkCommandPool vkCommandPool;
 	VkCommandBuffer vkCommandBuffer;
 
+	VkSemaphore vkImageAvailableSemaphore;
+	VkSemaphore vkRenderFinishedSemaphore;
+	VkFence vkInFlightFence;
+
 	// Useful data
 	struct QueueFamilyIndices queueIndices;
 };
 
 State initRenderer(struct Renderer* renderer);
-void runRenderer(struct Renderer renderer);
+void runRenderer(struct Renderer* renderer);
 void destroyRenderer(struct Renderer* renderer);

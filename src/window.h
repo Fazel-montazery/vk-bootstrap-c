@@ -5,3 +5,4 @@
 #include "renderer.h"
 
 State initWindow(int winWidth, int winHeight, const char* winTitle, struct Renderer* renderer);
+void updateFpsInWindowTitle(GLFWwindow* win);

@@ -20,7 +20,7 @@ State initRenderer(struct Renderer* renderer)
 	struct Renderer r = {0};
 
 	// Initialize glfw window
-	state = initWindow(1280, 720, "My Shit", &r);
+	state = initWindow(1280, 720, "FPS: NULL", &r);
 	CHECK_STATE(state);
 
 	// Creating a vulkan instance
@@ -86,6 +86,7 @@ void runRenderer(struct Renderer* renderer)
 	while(!glfwWindowShouldClose(renderer->window)) {
 		glfwPollEvents();
 		drawFrame(renderer);
+		updateFpsInWindowTitle(renderer->window);
 	}
 
 	vkDeviceWaitIdle(renderer->vkDevice);

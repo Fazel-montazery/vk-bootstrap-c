@@ -1,5 +1,10 @@
 #include "window.h"
 
+// For FPS counting
+static double previousTime;
+static int frameCount = 0;
+static char fps_str[20];
+
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) 
 {
     if (action == GLFW_PRESS) {
@@ -20,8 +25,24 @@ State initWindow(int winWidth, int winHeight, const char* winTitle, struct Rende
 		renderer->winWidth = winWidth;
 		renderer->winHeight = winHeight;
 		glfwSetKeyCallback(renderer->window, keyCallback);
+		previousTime = glfwGetTime(); // For FPS counting
 		return SUCCESS;
 	}
 
 	return ERROR_GLFW_WINDOW_CREATION;
+}
+
+void updateFpsInWindowTitle(GLFWwindow* win)
+{
+	double currentTime = glfwGetTime();
+	frameCount++;
+
+	if ( currentTime - previousTime >= 1.0 )
+	{
+		snprintf(fps_str, 19, "FPS: %d", frameCount);
+		glfwSetWindowTitle(win, fps_str);
+
+		frameCount = 0;
+		previousTime = currentTime;
+	}
 }

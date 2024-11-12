@@ -7,6 +7,7 @@
 #include "swap_chain.h"
 #include "graphics_pipeline.h"
 #include "framebuffer.h"
+#include "command.h"
 
 #ifndef NDEBUG
 #include "debug.h"
@@ -62,6 +63,10 @@ State initRenderer(struct Renderer* renderer)
 	// Creating frame buffers
 	state = createFramebuffers(&r);
 	CHECK_STATE(state);
+	
+	// Creating the command pool
+	state = createCommandPool(&r);
+	CHECK_STATE(state);
 
 	*renderer = r;
 	return state;
@@ -81,6 +86,8 @@ void destroyRenderer(struct Renderer* renderer)
 #ifndef NDEBUG
 	destroyDebugMessenger(renderer);
 #endif
+
+	vkDestroyCommandPool(r.vkDevice, r.vkCommandPool, NULL);
 
 	vkDestroyPipeline(r.vkDevice, r.vkGraphicsPipeline, NULL);
 	vkDestroyPipelineLayout(r.vkDevice, r.vkPipelineLayout, NULL);

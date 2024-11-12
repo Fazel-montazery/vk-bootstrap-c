@@ -78,6 +78,10 @@ void printState(State s)
 	case ERROR_VULKAN_FRAME_BUFFER_CREATION:
 		fprintf(stderr, "[Error] failed to create framebuffer!\n");
 		break;
+
+	case ERROR_VULKAN_COMMAND_POOL_CREATION:
+		fprintf(stderr, "[Error] failed to create command pool!\n");
+		break;
 	
 	default:
 		fprintf(stderr, "Unknown state!\n");

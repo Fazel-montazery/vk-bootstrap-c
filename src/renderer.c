@@ -6,6 +6,7 @@
 #include "device.h"
 #include "swap_chain.h"
 #include "graphics_pipeline.h"
+#include "framebuffer.h"
 
 #ifndef NDEBUG
 #include "debug.h"
@@ -58,6 +59,10 @@ State initRenderer(struct Renderer* renderer)
 	state = createGraphicsPipeline(&r);
 	CHECK_STATE(state);
 
+	// Creating frame buffers
+	state = createFramebuffers(&r);
+	CHECK_STATE(state);
+
 	*renderer = r;
 	return state;
 }
@@ -76,12 +81,20 @@ void destroyRenderer(struct Renderer* renderer)
 #ifndef NDEBUG
 	destroyDebugMessenger(renderer);
 #endif
+
 	vkDestroyPipeline(r.vkDevice, r.vkGraphicsPipeline, NULL);
 	vkDestroyPipelineLayout(r.vkDevice, r.vkPipelineLayout, NULL);
 	vkDestroyRenderPass(r.vkDevice, r.vkRenderPass, NULL);
+
+	for (int i = 0; i < vector_size(r.vkSwapChainFramebuffersVec); i++) {
+		vkDestroyFramebuffer(r.vkDevice, r.vkSwapChainFramebuffersVec[i], NULL);
+	}
+
 	for (int i = 0; i < vector_size(r.vkSwapChainImageViewsVec); i++) {
 		vkDestroyImageView(r.vkDevice, r.vkSwapChainImageViewsVec[i], NULL);
 	}
+
+	vector_free(r.vkSwapChainFramebuffersVec);
 	vector_free(r.vkSwapChainImageViewsVec);
 	vector_free(r.vkSwapChainImagesVec);
 	vkDestroySwapchainKHR(r.vkDevice, r.vkSwapChain, NULL);

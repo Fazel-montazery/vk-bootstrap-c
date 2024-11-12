@@ -75,6 +75,10 @@ void printState(State s)
 		fprintf(stderr, "[Error] failed to create graphics pipeline!\n");
 		break;
 
+	case ERROR_VULKAN_FRAME_BUFFER_CREATION:
+		fprintf(stderr, "[Error] failed to create framebuffer!\n");
+		break;
+	
 	default:
 		fprintf(stderr, "Unknown state!\n");
 	}

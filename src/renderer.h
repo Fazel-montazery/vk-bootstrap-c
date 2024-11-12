@@ -26,6 +26,7 @@ struct Renderer {
 	VkImageView* vkSwapChainImageViewsVec;
 	VkFormat vkSwapChainImageFormat;
 	VkExtent2D vkSwapChainExtent;
+	VkFramebuffer* vkSwapChainFramebuffersVec;
 
 	VkRenderPass vkRenderPass;
 	VkPipelineLayout vkPipelineLayout;

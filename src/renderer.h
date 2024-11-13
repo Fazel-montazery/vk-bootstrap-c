@@ -4,6 +4,8 @@
 
 #include "queue.h"
 
+#define MAX_FRAMES_IN_FLIGHT 2
+
 struct Renderer {
 	// Windowing
 	GLFWwindow* window;
@@ -33,11 +35,11 @@ struct Renderer {
 	VkPipeline vkGraphicsPipeline;
 
 	VkCommandPool vkCommandPool;
-	VkCommandBuffer vkCommandBuffer;
+	VkCommandBuffer vkCommandBuffers[MAX_FRAMES_IN_FLIGHT];
 
-	VkSemaphore vkImageAvailableSemaphore;
-	VkSemaphore vkRenderFinishedSemaphore;
-	VkFence vkInFlightFence;
+	VkSemaphore vkImageAvailableSemaphores[MAX_FRAMES_IN_FLIGHT];
+	VkSemaphore vkRenderFinishedSemaphores[MAX_FRAMES_IN_FLIGHT];
+	VkFence vkInFlightFences[MAX_FRAMES_IN_FLIGHT];
 
 	// Useful data
 	struct QueueFamilyIndices queueIndices;

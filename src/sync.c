@@ -9,10 +9,12 @@ State createSyncObjects(struct Renderer* renderer)
 	fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
 	fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
 
-	if (vkCreateSemaphore(renderer->vkDevice, &semaphoreInfo, NULL, &renderer->vkImageAvailableSemaphore) != VK_SUCCESS ||
-		vkCreateSemaphore(renderer->vkDevice, &semaphoreInfo, NULL, &renderer->vkRenderFinishedSemaphore) != VK_SUCCESS ||
-		vkCreateFence(renderer->vkDevice, &fenceInfo, NULL, &renderer->vkInFlightFence) != VK_SUCCESS) {
-		return ERROR_VULKAN_SYNC_OBJECTS_CREATION;
+	for (int i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
+		if (vkCreateSemaphore(renderer->vkDevice, &semaphoreInfo, NULL, &renderer->vkImageAvailableSemaphores[i]) != VK_SUCCESS ||
+			vkCreateSemaphore(renderer->vkDevice, &semaphoreInfo, NULL, &renderer->vkRenderFinishedSemaphores[i]) != VK_SUCCESS ||
+			vkCreateFence(renderer->vkDevice, &fenceInfo, NULL, &renderer->vkInFlightFences[i]) != VK_SUCCESS) {
+			return ERROR_VULKAN_SYNC_OBJECTS_CREATION;
+		}
 	}
 
 	return SUCCESS;

@@ -70,7 +70,7 @@ State initRenderer(struct Renderer* renderer)
 	CHECK_STATE(state);
 
 	// Creating the command buffer
-	state = createCommandBuffer(&r);
+	state = createCommandBuffers(&r);
 	CHECK_STATE(state);
 
 	// Creating the command buffer
@@ -100,9 +100,11 @@ void destroyRenderer(struct Renderer* renderer)
 	destroyDebugMessenger(renderer);
 #endif
 
-	vkDestroySemaphore(r.vkDevice, r.vkImageAvailableSemaphore, NULL);
-	vkDestroySemaphore(r.vkDevice, r.vkRenderFinishedSemaphore, NULL);
-	vkDestroyFence(r.vkDevice, r.vkInFlightFence, NULL);
+	for (int i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
+		vkDestroySemaphore(r.vkDevice, r.vkImageAvailableSemaphores[i], NULL);
+		vkDestroySemaphore(r.vkDevice, r.vkRenderFinishedSemaphores[i], NULL);
+		vkDestroyFence(r.vkDevice, r.vkInFlightFences[i], NULL);
+	}
 
 	vkDestroyCommandPool(r.vkDevice, r.vkCommandPool, NULL);
 

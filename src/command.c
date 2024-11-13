@@ -2,6 +2,8 @@
 
 #include "queue.h"
 
+static uint32_t currentFrame = 0; // For frames in flight
+
 State createCommandPool(struct Renderer* renderer)
 {
 	struct QueueFamilyIndices queueFamilyIndices = renderer->queueIndices;
@@ -18,15 +20,15 @@ State createCommandPool(struct Renderer* renderer)
 	return SUCCESS;
 }
 
-State createCommandBuffer(struct Renderer* renderer)
+State createCommandBuffers(struct Renderer* renderer)
 {
 	VkCommandBufferAllocateInfo allocInfo = {0};
 	allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
 	allocInfo.commandPool = renderer->vkCommandPool;
 	allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-	allocInfo.commandBufferCount = 1;
+	allocInfo.commandBufferCount = MAX_FRAMES_IN_FLIGHT;
 
-	if (vkAllocateCommandBuffers(renderer->vkDevice, &allocInfo, &renderer->vkCommandBuffer) != VK_SUCCESS) {
+	if (vkAllocateCommandBuffers(renderer->vkDevice, &allocInfo, renderer->vkCommandBuffers) != VK_SUCCESS) {
 		return ERROR_VULKAN_COMMAND_BUFFER_CREATION;
 	}
 	return SUCCESS;
@@ -85,31 +87,31 @@ State recordCommandBuffer(struct Renderer* renderer, VkCommandBuffer commandBuff
 
 State drawFrame(struct Renderer* r)
 {
-	vkWaitForFences(r->vkDevice, 1, &r->vkInFlightFence, VK_TRUE, UINT64_MAX);
-	vkResetFences(r->vkDevice, 1, &r->vkInFlightFence);
+	vkWaitForFences(r->vkDevice, 1, &r->vkInFlightFences[currentFrame], VK_TRUE, UINT64_MAX);
+	vkResetFences(r->vkDevice, 1, &r->vkInFlightFences[currentFrame]);
 
 	uint32_t imageIndex;
-	vkAcquireNextImageKHR(r->vkDevice, r->vkSwapChain, UINT64_MAX, r->vkImageAvailableSemaphore, VK_NULL_HANDLE, &imageIndex);
+	vkAcquireNextImageKHR(r->vkDevice, r->vkSwapChain, UINT64_MAX, r->vkImageAvailableSemaphores[currentFrame], VK_NULL_HANDLE, &imageIndex);
 
-	vkResetCommandBuffer(r->vkCommandBuffer, 0);
-	recordCommandBuffer(r, r->vkCommandBuffer, imageIndex);
+	vkResetCommandBuffer(r->vkCommandBuffers[currentFrame], 0);
+	recordCommandBuffer(r, r->vkCommandBuffers[currentFrame], imageIndex);
 
 	VkSubmitInfo submitInfo = {0};
 	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 
-	VkSemaphore waitSemaphores[] = { r->vkImageAvailableSemaphore };
+	VkSemaphore waitSemaphores[] = { r->vkImageAvailableSemaphores[currentFrame] };
 	VkPipelineStageFlags waitStages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
 	submitInfo.waitSemaphoreCount = 1;
 	submitInfo.pWaitSemaphores = waitSemaphores;
 	submitInfo.pWaitDstStageMask = waitStages;
 	submitInfo.commandBufferCount = 1;
-	submitInfo.pCommandBuffers = &r->vkCommandBuffer;
+	submitInfo.pCommandBuffers = &r->vkCommandBuffers[currentFrame];
 
-	VkSemaphore signalSemaphores[] = { r->vkRenderFinishedSemaphore };
+	VkSemaphore signalSemaphores[] = { r->vkRenderFinishedSemaphores[currentFrame] };
 	submitInfo.signalSemaphoreCount = 1;
 	submitInfo.pSignalSemaphores = signalSemaphores;
 
-	if (vkQueueSubmit(r->vkGraphicsQueue, 1, &submitInfo, r->vkInFlightFence) != VK_SUCCESS) {
+	if (vkQueueSubmit(r->vkGraphicsQueue, 1, &submitInfo, r->vkInFlightFences[currentFrame]) != VK_SUCCESS) {
 		return ERROR_VULKAN_DRAW_COMMAND_SUBMIT;
 	}
 
@@ -125,6 +127,8 @@ State drawFrame(struct Renderer* r)
 	presentInfo.pImageIndices = &imageIndex;
 
 	vkQueuePresentKHR(r->vkPresentQueue, &presentInfo);
+
+	currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
 
 	return SUCCESS;
 }

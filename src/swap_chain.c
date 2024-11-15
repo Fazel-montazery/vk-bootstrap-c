@@ -4,6 +4,8 @@
 
 #include "utils.h"
 
+#include "framebuffer.h"
+
 struct SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device, VkSurfaceKHR surface)
 {
 	struct SwapChainSupportDetails details = {0};
@@ -69,12 +71,9 @@ static VkExtent2D chooseSwapExtent(struct Renderer* renderer, VkSurfaceCapabilit
 	if (capabilities.currentExtent.width != UINT32_MAX) {
 		return capabilities.currentExtent;
 	} else {
-		int width, height;
-		glfwGetFramebufferSize(renderer->window, &width, &height);
-
 		VkExtent2D actualExtent = {
-			(uint32_t) width,
-			(uint32_t) height
+			renderer->winWidth,
+			renderer->winHeight
 		};
 
 		actualExtent.width = clamp(actualExtent.width, capabilities.minImageExtent.width, capabilities.maxImageExtent.width);
@@ -176,5 +175,37 @@ State createImageViews(struct Renderer* renderer)
 
 	renderer->vkSwapChainImageViewsVec = swapChainImageViewsVec;
 
+	return SUCCESS;
+}
+
+void cleanupSwapChain(struct Renderer* r)
+{
+	for (int i = 0; i < vector_size(r->vkSwapChainFramebuffersVec); i++) {
+		vkDestroyFramebuffer(r->vkDevice, r->vkSwapChainFramebuffersVec[i], NULL);
+	}
+
+	for (int i = 0; i < vector_size(r->vkSwapChainImageViewsVec); i++) {
+		vkDestroyImageView(r->vkDevice, r->vkSwapChainImageViewsVec[i], NULL);
+	}
+
+	vector_free(r->vkSwapChainFramebuffersVec);
+	vector_free(r->vkSwapChainImageViewsVec);
+
+	vkDestroySwapchainKHR(r->vkDevice, r->vkSwapChain, NULL);
+}
+
+State recreateSwapChain(struct Renderer* renderer)
+{
+	while (renderer->winWidth == 0 || renderer->winHeight == 0) {
+		glfwWaitEvents();
+	}
+
+	vkDeviceWaitIdle(renderer->vkDevice);
+
+	cleanupSwapChain(renderer);
+
+	createSwapChain(renderer);
+	createImageViews(renderer);
+	createFramebuffers(renderer);
 	return SUCCESS;
 }

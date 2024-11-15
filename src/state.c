@@ -51,6 +51,14 @@ void printState(State s)
 		fprintf(stderr, "[Error] failed to create swap chain!\n");
 		break;
 
+	case ERROR_VULKAN_SWAPCHAIN_ACQUIRE_IMAGE:
+		fprintf(stderr, "[Error] failed to acquire swap chain image!\n");
+		break;
+
+	case ERROR_VULKAN_SWAPCHAIN_PRESENT_IMAGE:
+		fprintf(stderr, "[Error] failed to present swap chain image!\n");
+		break;
+
 	case ERROR_VULKAN_IMAGE_VIEW_CREATION:
 		fprintf(stderr, "[Error] failed to create image views!\n");
 		break;

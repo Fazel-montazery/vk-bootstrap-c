@@ -2,6 +2,8 @@
 
 #include "queue.h"
 
+#include "swap_chain.h"
+
 static uint32_t currentFrame = 0; // For frames in flight
 
 State createCommandPool(struct Renderer* renderer)
@@ -88,10 +90,18 @@ State recordCommandBuffer(struct Renderer* renderer, VkCommandBuffer commandBuff
 State drawFrame(struct Renderer* r)
 {
 	vkWaitForFences(r->vkDevice, 1, &r->vkInFlightFences[currentFrame], VK_TRUE, UINT64_MAX);
-	vkResetFences(r->vkDevice, 1, &r->vkInFlightFences[currentFrame]);
 
 	uint32_t imageIndex;
-	vkAcquireNextImageKHR(r->vkDevice, r->vkSwapChain, UINT64_MAX, r->vkImageAvailableSemaphores[currentFrame], VK_NULL_HANDLE, &imageIndex);
+	VkResult result = vkAcquireNextImageKHR(r->vkDevice, r->vkSwapChain, UINT64_MAX, r->vkImageAvailableSemaphores[currentFrame], VK_NULL_HANDLE, &imageIndex);
+
+	if (result == VK_ERROR_OUT_OF_DATE_KHR) {
+		recreateSwapChain(r);
+		return SUCCESS;
+	} else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
+		return ERROR_VULKAN_SWAPCHAIN_ACQUIRE_IMAGE;
+	}
+
+	vkResetFences(r->vkDevice, 1, &r->vkInFlightFences[currentFrame]);
 
 	vkResetCommandBuffer(r->vkCommandBuffers[currentFrame], 0);
 	recordCommandBuffer(r, r->vkCommandBuffers[currentFrame], imageIndex);
@@ -126,7 +136,14 @@ State drawFrame(struct Renderer* r)
 	presentInfo.pSwapchains = swapChains;
 	presentInfo.pImageIndices = &imageIndex;
 
-	vkQueuePresentKHR(r->vkPresentQueue, &presentInfo);
+	result = vkQueuePresentKHR(r->vkPresentQueue, &presentInfo);
+
+	if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || r->framebufferResized) {
+		r->framebufferResized = false;
+		recreateSwapChain(r);
+	} else if (result != VK_SUCCESS) {
+		return ERROR_VULKAN_SWAPCHAIN_PRESENT_IMAGE;
+	}
 
 	currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
 

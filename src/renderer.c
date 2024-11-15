@@ -96,9 +96,13 @@ void destroyRenderer(struct Renderer* renderer)
 {
 	struct Renderer r = *renderer;
 
-#ifndef NDEBUG
-	destroyDebugMessenger(renderer);
-#endif
+	cleanupSwapChain(renderer);
+	vector_free(r.vkSwapChainImagesVec);
+
+	vkDestroyPipeline(r.vkDevice, r.vkGraphicsPipeline, NULL);
+	vkDestroyPipelineLayout(r.vkDevice, r.vkPipelineLayout, NULL);
+
+	vkDestroyRenderPass(r.vkDevice, r.vkRenderPass, NULL);
 
 	for (int i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
 		vkDestroySemaphore(r.vkDevice, r.vkImageAvailableSemaphores[i], NULL);
@@ -108,23 +112,10 @@ void destroyRenderer(struct Renderer* renderer)
 
 	vkDestroyCommandPool(r.vkDevice, r.vkCommandPool, NULL);
 
-	vkDestroyPipeline(r.vkDevice, r.vkGraphicsPipeline, NULL);
-	vkDestroyPipelineLayout(r.vkDevice, r.vkPipelineLayout, NULL);
-	vkDestroyRenderPass(r.vkDevice, r.vkRenderPass, NULL);
-
-	for (int i = 0; i < vector_size(r.vkSwapChainFramebuffersVec); i++) {
-		vkDestroyFramebuffer(r.vkDevice, r.vkSwapChainFramebuffersVec[i], NULL);
-	}
-
-	for (int i = 0; i < vector_size(r.vkSwapChainImageViewsVec); i++) {
-		vkDestroyImageView(r.vkDevice, r.vkSwapChainImageViewsVec[i], NULL);
-	}
-
-	vector_free(r.vkSwapChainFramebuffersVec);
-	vector_free(r.vkSwapChainImageViewsVec);
-	vector_free(r.vkSwapChainImagesVec);
-	vkDestroySwapchainKHR(r.vkDevice, r.vkSwapChain, NULL);
 	vkDestroyDevice(r.vkDevice, NULL);
+#ifndef NDEBUG
+	destroyDebugMessenger(renderer);
+#endif
 	vkDestroySurfaceKHR(r.vkInstance, r.vkSurface, NULL);
 	vkDestroyInstance(r.vkInstance, NULL);
 	glfwDestroyWindow(r.window);

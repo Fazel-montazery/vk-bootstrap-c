@@ -9,8 +9,8 @@
 struct Renderer {
 	// Windowing
 	GLFWwindow* window;
-	int winWidth;
-	int winHeight;
+	uint32_t winWidth;
+	uint32_t winHeight;
 
 	// Vulkan handles
 	VkInstance vkInstance;
@@ -40,6 +40,8 @@ struct Renderer {
 	VkSemaphore vkImageAvailableSemaphores[MAX_FRAMES_IN_FLIGHT];
 	VkSemaphore vkRenderFinishedSemaphores[MAX_FRAMES_IN_FLIGHT];
 	VkFence vkInFlightFences[MAX_FRAMES_IN_FLIGHT];
+
+	bool framebufferResized;
 
 	// Useful data
 	struct QueueFamilyIndices queueIndices;

@@ -27,7 +27,7 @@ State initWindow(int winWidth, int winHeight, const char* winTitle, struct Rende
 	glfwInit();
 
 	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-	glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
+	glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 	glfwWindowHint(GLFW_FOCUSED, GLFW_TRUE);
 
 	if((renderer->window = glfwCreateWindow(winWidth, winHeight, winTitle, NULL, NULL))) {

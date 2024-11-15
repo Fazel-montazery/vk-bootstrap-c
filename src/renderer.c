@@ -10,6 +10,8 @@
 #include "command.h"
 #include "sync.h"
 
+#include "vertex.h"
+
 #ifndef NDEBUG
 #include "debug.h"
 #endif
@@ -69,6 +71,10 @@ State initRenderer(struct Renderer* renderer)
 	state = createCommandPool(&r);
 	CHECK_STATE(state);
 
+	// Creating the vertex buffer
+	state = createVertexBuffer(&r);
+	CHECK_STATE(state);
+
 	// Creating the command buffer
 	state = createCommandBuffers(&r);
 	CHECK_STATE(state);
@@ -76,6 +82,9 @@ State initRenderer(struct Renderer* renderer)
 	// Creating the command buffer
 	state = createSyncObjects(&r);
 	CHECK_STATE(state);
+
+	// Initialize Vertices Binding/Attrib descriptions
+	initBindingAttribDescriptionVertices();
 
 	*renderer = r;
 	return state;
@@ -98,6 +107,8 @@ void destroyRenderer(struct Renderer* renderer)
 
 	cleanupSwapChain(renderer);
 	vector_free(r.vkSwapChainImagesVec);
+
+	vkDestroyBuffer(r.vkDevice, r.vkVertexBuffer, NULL);
 
 	vkDestroyPipeline(r.vkDevice, r.vkGraphicsPipeline, NULL);
 	vkDestroyPipelineLayout(r.vkDevice, r.vkPipelineLayout, NULL);

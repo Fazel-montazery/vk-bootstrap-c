@@ -2,6 +2,9 @@
 
 #include "utils.h"
 
+extern VkVertexInputBindingDescription bindingDescriptionVertex2D;
+extern VkVertexInputAttributeDescription attributeDescriptionsVertex2D[2];
+
 static VkShaderModule createShaderModule(unsigned char* src, size_t size, struct Renderer* renderer)
 {
 	VkShaderModuleCreateInfo createInfo = {0};
@@ -72,10 +75,10 @@ State createGraphicsPipeline(struct Renderer* renderer)
 
 	VkPipelineVertexInputStateCreateInfo vertexInputInfo = {0};
 	vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-	vertexInputInfo.vertexBindingDescriptionCount = 0;
-	vertexInputInfo.pVertexBindingDescriptions = NULL; // Optional
-	vertexInputInfo.vertexAttributeDescriptionCount = 0;
-	vertexInputInfo.pVertexAttributeDescriptions = NULL; // Optional
+	vertexInputInfo.vertexBindingDescriptionCount = 1;
+	vertexInputInfo.pVertexBindingDescriptions = &bindingDescriptionVertex2D;
+	vertexInputInfo.vertexAttributeDescriptionCount = 2;
+	vertexInputInfo.pVertexAttributeDescriptions = attributeDescriptionsVertex2D;
 	
 	VkPipelineInputAssemblyStateCreateInfo inputAssembly = {0};
 	inputAssembly.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;

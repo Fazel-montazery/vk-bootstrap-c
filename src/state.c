@@ -111,6 +111,10 @@ void printState(State s)
 		fprintf(stderr, "[Error] failed to submit draw command buffer!\n");
 		break;
 
+	case ERROR_VULKAN_VERTEX_BUFFER_CREATION:
+		fprintf(stderr, "[Error] failed to create vertex buffer!\n");
+		break;
+
 	default:
 		fprintf(stderr, "Unknown state!\n");
 	}

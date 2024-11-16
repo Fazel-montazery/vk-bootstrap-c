@@ -61,6 +61,10 @@ State recordCommandBuffer(struct Renderer* renderer, VkCommandBuffer commandBuff
 
 	vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, renderer->vkGraphicsPipeline);
 
+	VkBuffer vertexBuffers[] = {renderer->vkVertexBuffer};
+	VkDeviceSize offsets[] = {0};
+	vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
+
 	VkViewport viewport = {0};
 	viewport.x = 0.0f;
 	viewport.y = 0.0f;

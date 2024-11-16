@@ -21,17 +21,19 @@ void initBindingAttribDescriptionVertices()
 	attributeDescriptionsVertex2D[1].offset = offsetof(struct Vertex2D, color);
 }
 
-static uint32_t findMemoryType(struct Renderer* renderer, uint32_t typeFilter, VkMemoryPropertyFlags properties) 
+static State findMemoryType(struct Renderer* renderer, uint32_t typeFilter, VkMemoryPropertyFlags properties, uint32_t* result) 
 {
 	VkPhysicalDeviceMemoryProperties memProperties;
 	vkGetPhysicalDeviceMemoryProperties(renderer->vkPhysicalDevice, &memProperties);
 
 	for (uint32_t i = 0; i < memProperties.memoryTypeCount; i++) {
-		if (typeFilter & (1 << i)) {
-			return i;
+		if ((typeFilter & (1 << i)) && (memProperties.memoryTypes[i].propertyFlags & properties) == properties) {
+			*result = i;
+			return SUCCESS;
 		}
 	}
 
+	return ERROR_VULKAN_NO_SUITABLE_MEMORY_TYPE;
 }
 
 State createVertexBuffer(struct Renderer* renderer)
@@ -51,6 +53,28 @@ State createVertexBuffer(struct Renderer* renderer)
 	if (vkCreateBuffer(renderer->vkDevice, &bufferInfo, NULL, &renderer->vkVertexBuffer) != VK_SUCCESS) {
 		return ERROR_VULKAN_VERTEX_BUFFER_CREATION;
 	}
+
+	VkMemoryRequirements memRequirements;
+	vkGetBufferMemoryRequirements(renderer->vkDevice, renderer->vkVertexBuffer, &memRequirements);
+
+	VkMemoryAllocateInfo allocInfo = {0};
+	allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+	allocInfo.allocationSize = memRequirements.size;
+	State result = findMemoryType(renderer, memRequirements.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &allocInfo.memoryTypeIndex);
+
+	if (result != SUCCESS)
+		return result;
+
+	if (vkAllocateMemory(renderer->vkDevice, &allocInfo, NULL, &renderer->vkVertexBufferMemory) != VK_SUCCESS) {
+		return ERROR_VULKAN_VERTEX_BUFFER_ALLOCATION;
+	}
+
+	vkBindBufferMemory(renderer->vkDevice, renderer->vkVertexBuffer, renderer->vkVertexBufferMemory, 0);
+
+	void* data;
+	vkMapMemory(renderer->vkDevice, renderer->vkVertexBufferMemory, 0, bufferInfo.size, 0, &data);
+		memcpy(data, vertices, (size_t) bufferInfo.size);
+	vkUnmapMemory(renderer->vkDevice, renderer->vkVertexBufferMemory);
 
 	return SUCCESS;
 }

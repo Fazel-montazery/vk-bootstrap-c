@@ -30,14 +30,20 @@ typedef enum {
 	ERROR_VULKAN_COMMAND_BUFFER_RECORD,
 	ERROR_VULKAN_SYNC_OBJECTS_CREATION,
 	ERROR_VULKAN_DRAW_COMMAND_SUBMIT,
-	ERROR_VULKAN_VERTEX_BUFFER_CREATION
+	ERROR_VULKAN_VERTEX_BUFFER_CREATION,
+	ERROR_VULKAN_NO_SUITABLE_MEMORY_TYPE,
+	ERROR_VULKAN_VERTEX_BUFFER_ALLOCATION
 } State;
 
-void printState(State s);
 
+#ifndef NDEBUG
+void printState(State s);
 #define CHECK_STATE(state) do {         \
         if (state != SUCCESS) {         \
                 printState(state);      \
                 return state;           \
         }                               \
 } while(0)
+#else
+#define CHECK_STATE(state) do { } while(0)
+#endif

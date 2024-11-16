@@ -59,6 +59,9 @@ State initRenderer(struct Renderer* renderer)
 	state = createRenderPass(&r);
 	CHECK_STATE(state);
 
+	// Initialize Vertices Binding/Attrib descriptions
+	initBindingAttribDescriptionVertices();
+
 	// Creating the initial graphics pipeline
 	state = createGraphicsPipeline(&r);
 	CHECK_STATE(state);
@@ -83,9 +86,6 @@ State initRenderer(struct Renderer* renderer)
 	state = createSyncObjects(&r);
 	CHECK_STATE(state);
 
-	// Initialize Vertices Binding/Attrib descriptions
-	initBindingAttribDescriptionVertices();
-
 	*renderer = r;
 	return state;
 }
@@ -109,6 +109,7 @@ void destroyRenderer(struct Renderer* renderer)
 	vector_free(r.vkSwapChainImagesVec);
 
 	vkDestroyBuffer(r.vkDevice, r.vkVertexBuffer, NULL);
+	vkFreeMemory(r.vkDevice, r.vkVertexBufferMemory, NULL);
 
 	vkDestroyPipeline(r.vkDevice, r.vkGraphicsPipeline, NULL);
 	vkDestroyPipelineLayout(r.vkDevice, r.vkPipelineLayout, NULL);

@@ -42,6 +42,7 @@ struct Renderer {
 	VkFence vkInFlightFences[MAX_FRAMES_IN_FLIGHT];
 
 	VkBuffer vkVertexBuffer;
+	VkDeviceMemory vkVertexBufferMemory;
 
 	bool framebufferResized;
 

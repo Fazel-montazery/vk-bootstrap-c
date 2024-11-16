@@ -1,3 +1,5 @@
+#ifndef NDEBUG
+
 #include "state.h"
 
 void printState(State s)
@@ -115,7 +117,17 @@ void printState(State s)
 		fprintf(stderr, "[Error] failed to create vertex buffer!\n");
 		break;
 
+	case ERROR_VULKAN_NO_SUITABLE_MEMORY_TYPE:
+		fprintf(stderr, "[Error] failed to find suitable memory type!\n");
+		break;
+
+	case ERROR_VULKAN_VERTEX_BUFFER_ALLOCATION:
+		fprintf(stderr, "[Error] failed to allocate vertex buffer memory!\n");
+		break;
+
 	default:
 		fprintf(stderr, "Unknown state!\n");
 	}
 }
+
+#endif

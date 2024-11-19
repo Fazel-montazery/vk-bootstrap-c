@@ -4,5 +4,8 @@
 
 #include "renderer.h"
 
-State initWindow(int winWidth, int winHeight, const char* winTitle, struct Renderer* renderer);
+State initWindow(struct Renderer* renderer);
+
+#ifndef NDEBUG
 void updateFpsInWindowTitle(GLFWwindow* win);
+#endif

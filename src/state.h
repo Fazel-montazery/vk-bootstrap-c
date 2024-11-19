@@ -1,6 +1,6 @@
 #pragma once
 
-#include <stdio.h>
+#include "config.h"
 
 typedef enum {
 	SUCCESS = 0,
@@ -35,7 +35,6 @@ typedef enum {
 	ERROR_VULKAN_VERTEX_BUFFER_ALLOCATION
 } State;
 
-
 #ifndef NDEBUG
 void printState(State s);
 #define CHECK_STATE(state) do {         \
@@ -47,3 +46,9 @@ void printState(State s);
 #else
 #define CHECK_STATE(state) do { } while(0)
 #endif
+
+typedef enum {
+	PHYSICAL_DEVICE_TYPE_AUTO = 0,
+	PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU = VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU,
+	PHYSICAL_DEVICE_TYPE_DISCRETE_GPU = VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU,
+} PhysicalDeviceType;

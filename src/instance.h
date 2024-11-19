@@ -4,4 +4,4 @@
 
 #include "renderer.h"
 
-State createVulkanInstance(const char* appName, struct Renderer* renderer);
+State createVulkanInstance(struct Renderer* renderer);

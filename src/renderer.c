@@ -16,17 +16,18 @@
 #include "debug.h"
 #endif
 
-State initRenderer(struct Renderer* renderer)
+State initRenderer(struct Renderer* renderer, struct RendererConfig* config)
 {
 	State state = SUCCESS;
 	struct Renderer r = {0};
+	r.config = *config;
 
 	// Initialize glfw window
-	state = initWindow(1280, 720, "FPS: NULL", &r);
+	state = initWindow(&r);
 	CHECK_STATE(state);
 
 	// Creating a vulkan instance
-	state = createVulkanInstance("My Shit", &r);
+	state = createVulkanInstance(&r);
 	CHECK_STATE(state);
 
 #ifndef NDEBUG
@@ -95,7 +96,9 @@ void runRenderer(struct Renderer* renderer)
 	while(!glfwWindowShouldClose(renderer->window)) {
 		glfwPollEvents();
 		drawFrame(renderer);
+#ifndef NDEBUG
 		updateFpsInWindowTitle(renderer->window);
+#endif
 	}
 
 	vkDeviceWaitIdle(renderer->vkDevice);

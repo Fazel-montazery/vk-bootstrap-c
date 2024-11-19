@@ -1,18 +1,11 @@
 #include "window.h"
 
+#ifndef NDEBUG
 // For FPS counting
 static double previousTime;
 static int frameCount = 0;
 static char fps_str[20];
-
-static void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) 
-{
-    if (action == GLFW_PRESS) {
-        if (key == GLFW_KEY_ESCAPE || key == GLFW_KEY_Q) {
-            glfwSetWindowShouldClose(window, true);
-        }
-    }
-}
+#endif
 
 static void framebufferResizeCallback(GLFWwindow* window, int width, int height) 
 {
@@ -22,21 +15,27 @@ static void framebufferResizeCallback(GLFWwindow* window, int width, int height)
 	r->winHeight = height;
 }
 
-State initWindow(int winWidth, int winHeight, const char* winTitle, struct Renderer* renderer)
+State initWindow(struct Renderer* renderer)
 {
 	glfwInit();
 
 	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-	glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
-	glfwWindowHint(GLFW_FOCUSED, GLFW_TRUE);
+	glfwWindowHint(GLFW_RESIZABLE, renderer->config.winResizable);
+	glfwWindowHint(GLFW_FOCUSED, renderer->config.winFocused);
 
-	if((renderer->window = glfwCreateWindow(winWidth, winHeight, winTitle, NULL, NULL))) {
+	uint32_t winWidth = renderer->config.winInitWidth;
+	uint32_t winHeight = renderer->config.winInitHeight;
+
+	if((renderer->window = glfwCreateWindow(winWidth, winHeight, renderer->config.winTitle, NULL, NULL))) {
 		renderer->winWidth = winWidth;
 		renderer->winHeight = winHeight;
 		glfwSetWindowUserPointer(renderer->window, renderer);
-		glfwSetKeyCallback(renderer->window, keyCallback);
+		glfwSetKeyCallback(renderer->window, renderer->config.keyCallback);
 		glfwSetFramebufferSizeCallback(renderer->window, framebufferResizeCallback);
+
+#ifndef NDEBUG
 		previousTime = glfwGetTime(); // For FPS counting
+#endif
 
 		GLFWmonitor* primaryMonitor = glfwGetPrimaryMonitor();
 		const GLFWvidmode* vidmode = glfwGetVideoMode(primaryMonitor);
@@ -56,6 +55,7 @@ State initWindow(int winWidth, int winHeight, const char* winTitle, struct Rende
 	return ERROR_GLFW_WINDOW_CREATION;
 }
 
+#ifndef NDEBUG
 void updateFpsInWindowTitle(GLFWwindow* win)
 {
 	double currentTime = glfwGetTime();
@@ -70,3 +70,4 @@ void updateFpsInWindowTitle(GLFWwindow* win)
 		previousTime = currentTime;
 	}
 }
+#endif

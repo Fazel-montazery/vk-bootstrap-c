@@ -11,11 +11,11 @@ extern const char* validationLayers[];
 #endif
 
 static const uint32_t deviceExtensionCount = 1;
-static const char* deviceExtensions[] = {
+static char* deviceExtensions[] = {
 	VK_KHR_SWAPCHAIN_EXTENSION_NAME,
 };
 
-static bool checkDeviceExtensionSupport(VkPhysicalDevice device) 
+static bool checkDeviceExtensionSupport(VkPhysicalDevice device, char** requiredDeviceExtensions)
 {
 	uint32_t extensionCount;
 	vkEnumerateDeviceExtensionProperties(device, NULL, &extensionCount, NULL);
@@ -24,18 +24,20 @@ static bool checkDeviceExtensionSupport(VkPhysicalDevice device)
 	vector_reserve(&availableExtensionsVec, extensionCount);
 	vkEnumerateDeviceExtensionProperties(device, NULL, &extensionCount, availableExtensionsVec);
 
-	for (uint32_t i = 0; i < deviceExtensionCount; i++) {
+	for (uint32_t i = 0; i < vector_size(requiredDeviceExtensions); i++) {
 		bool found = false;
 		for (uint32_t j = 0; j < extensionCount; j++) {
-			if (strcmp(deviceExtensions[i], availableExtensionsVec[j].extensionName) == 0) {
+			if (strcmp(requiredDeviceExtensions[i], availableExtensionsVec[j].extensionName) == 0) {
 				found = true;
 				break;
 			}
 		}
 
 		if (!found) {
+			VkPhysicalDeviceProperties deviceProperties;
+			vkGetPhysicalDeviceProperties(device, &deviceProperties);
 #ifndef NDEBUG
-			fprintf(stderr, "[Error] Not supporting [%s] extension!\n", deviceExtensions[i]);
+			fprintf(stderr, "[Error] (%s) Not supporting (%s) extension!\n", deviceProperties.deviceName, requiredDeviceExtensions[i]);
 #endif
 			vector_free(availableExtensionsVec);
 			return false;
@@ -46,14 +48,14 @@ static bool checkDeviceExtensionSupport(VkPhysicalDevice device)
 	return true;
 }
 
-static int getDeviceScore(VkPhysicalDevice device, VkSurfaceKHR surface)
+static int getDeviceScore(VkPhysicalDevice device, VkSurfaceKHR surface, char** requiredDeviceExtensions, PhysicalDeviceType preferredType)
 {
 	struct QueueFamilyIndices indices = findQueueFamilies(device, surface);
 	if (!indices.graphicsFamilyExists || !indices.presentFamilyExists) {
 		return -1;
 	}
 
-	if (!checkDeviceExtensionSupport(device)) {
+	if (!checkDeviceExtensionSupport(device, requiredDeviceExtensions)) {
 		return -1;
 	}
 
@@ -70,8 +72,10 @@ static int getDeviceScore(VkPhysicalDevice device, VkSurfaceKHR surface)
 	VkPhysicalDeviceProperties deviceProperties;
 	vkGetPhysicalDeviceProperties(device, &deviceProperties);
 
-	if (deviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU) {
-		score += 1000;
+	if (preferredType == PHYSICAL_DEVICE_TYPE_AUTO && deviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU) {
+		score += 10000;
+	} else if (deviceProperties.deviceType == (VkPhysicalDeviceType) preferredType) {
+		score += 100000;
 	}
 
 	score += deviceProperties.limits.maxImageDimension2D;
@@ -99,10 +103,21 @@ State pickPhysicalDevice(struct Renderer* renderer)
 
 	renderer->vkPhysicalDevice = VK_NULL_HANDLE;
 
+	char** requiredDeviceExtensions = vector_create();
+	vector_reserve(&requiredDeviceExtensions, deviceExtensionCount + renderer->config.extraDeviceExtensionsCount);
+
+	for (uint32_t i = 0; i < deviceExtensionCount; i++) {
+		vector_add(&requiredDeviceExtensions, deviceExtensions[i]);
+	}
+
+	for (uint32_t i = 0; i < renderer->config.extraDeviceExtensionsCount; i++) {
+		vector_add(&requiredDeviceExtensions, renderer->config.extraDeviceExtensions[i]);
+	}
+
 	int deviceScore = -1;
 	VkPhysicalDevice tmpDevice = VK_NULL_HANDLE;
 	for (uint32_t i = 0; i < deviceCount; i++) {
-		int tmpScore = getDeviceScore(devicesVec[i], renderer->vkSurface);
+		int tmpScore = getDeviceScore(devicesVec[i], renderer->vkSurface, requiredDeviceExtensions, renderer->config.preferredPhysicalDeviceType);
 		if (tmpScore > deviceScore) {
 			tmpDevice = devicesVec[i];
 			deviceScore = tmpScore;
@@ -111,11 +126,14 @@ State pickPhysicalDevice(struct Renderer* renderer)
 
 	if (deviceScore == -1) {
 		vector_free(devicesVec);
+		vector_free(requiredDeviceExtensions);
 		return ERROR_VULKAN_NO_SUITABLE_GPU;
 	}
 
 	renderer->vkPhysicalDevice = tmpDevice;
 	renderer->queueIndices = findQueueFamilies(tmpDevice, renderer->vkSurface);
+
+	renderer->requiredDeviceExtensions = requiredDeviceExtensions;
 
 	vector_free(devicesVec);
 	return SUCCESS;
@@ -148,8 +166,8 @@ State createLogicalDevice(struct Renderer* renderer)
 	createInfo.pQueueCreateInfos = queueCreateInfosVec;
 	createInfo.pEnabledFeatures = &deviceFeatures;
 
-	createInfo.enabledExtensionCount = deviceExtensionCount;
-	createInfo.ppEnabledExtensionNames = deviceExtensions;
+	createInfo.enabledExtensionCount = (uint32_t) vector_size(renderer->requiredDeviceExtensions);
+	createInfo.ppEnabledExtensionNames = (const char**) renderer->requiredDeviceExtensions;
 
 #ifndef NDEBUG
     		createInfo.enabledLayerCount = validationLayerCount;
@@ -165,6 +183,7 @@ State createLogicalDevice(struct Renderer* renderer)
 	vkGetDeviceQueue(renderer->vkDevice, indices.graphicsFamily, 0, &renderer->vkGraphicsQueue);
 	vkGetDeviceQueue(renderer->vkDevice, indices.presentFamily, 0, &renderer->vkPresentQueue);
 	
+	vector_free(renderer->requiredDeviceExtensions);
 	vector_free(queueCreateInfosVec);
 	vector_free(uniqueQueueFamiliesSet);
 	return SUCCESS;

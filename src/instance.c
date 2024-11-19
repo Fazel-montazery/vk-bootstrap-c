@@ -26,6 +26,9 @@ static bool checkExtensionsSupport(const char** requiredExtensionsVec)
 
 		if (!found) {
 			vector_free(extensionsVec);
+#ifndef NDEBUG
+			fprintf(stderr, "[Error] Extension Not suppoerted: (%s)\n", requiredExtensionsVec[i]);
+#endif
 			return false;
 		}
 	}
@@ -64,22 +67,22 @@ static bool checkValidationLayersSupport()
 }
 #endif
 
-State createVulkanInstance(const char* appName, struct Renderer* renderer)
+State createVulkanInstance(struct Renderer* renderer)
 {
 	VkApplicationInfo appInfo = {0};
 	appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
-	appInfo.pApplicationName = appName;
-	appInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
-	appInfo.pEngineName = "No Engine";
-	appInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
-	appInfo.apiVersion = VK_API_VERSION_1_0;
+	appInfo.pApplicationName = renderer->config.appName;
+	appInfo.applicationVersion = renderer->config.appVersion;
+	appInfo.pEngineName = renderer->config.engineName;
+	appInfo.engineVersion = renderer->config.engineVersion;
+	appInfo.apiVersion = renderer->config.apiVersion;
 
 	// Fetching and testing extensions
 	uint32_t glfwExtensionCount = 0;
 	const char** glfwExtensions;
 	glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
 
-	uint32_t requiredExtensionCount = glfwExtensionCount;
+	uint32_t requiredExtensionCount = glfwExtensionCount + renderer->config.extraInstanceExtensionsCount;
 #if defined __APPLE__ && defined __MACH__
 	requiredExtensionCount++;
 #endif
@@ -92,6 +95,10 @@ State createVulkanInstance(const char* appName, struct Renderer* renderer)
 	vector_reserve(&requiredExtensionsVec, requiredExtensionCount);
 	for (uint32_t i = 0; i < glfwExtensionCount; i++) {
 		vector_add(&requiredExtensionsVec, glfwExtensions[i]);
+	}
+
+	for (uint32_t i = 0; i < renderer->config.extraInstanceExtensionsCount; i++) {
+		vector_add(&requiredExtensionsVec, renderer->config.extraInstanceExtensions[i]);
 	}
 
 #if defined __APPLE__ && defined __MACH__

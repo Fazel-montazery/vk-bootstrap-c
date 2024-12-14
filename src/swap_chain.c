@@ -44,10 +44,10 @@ void destroySwapChainSupportDetails(struct SwapChainSupportDetails* details)
 		vector_free(details->presentModesVec);
 }
 
-static VkSurfaceFormatKHR chooseSwapSurfaceFormat(VkSurfaceFormatKHR* availableFormatsVec)
+static VkSurfaceFormatKHR chooseSwapSurfaceFormat(VkSurfaceFormatKHR* availableFormatsVec, struct RendererConfig* config)
 {
 	for (int i = 0; i < vector_size(availableFormatsVec); i++) {
-		if (availableFormatsVec[i].format == VK_FORMAT_B8G8R8A8_SRGB && availableFormatsVec[i].colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) {
+		if (availableFormatsVec[i].format == config->preferredSwapchainSurfaceFormat && availableFormatsVec[i].colorSpace == config->preferredSwapchainSurfaceColorSpace) {
 			return availableFormatsVec[i];
 		}
 	}
@@ -55,10 +55,10 @@ static VkSurfaceFormatKHR chooseSwapSurfaceFormat(VkSurfaceFormatKHR* availableF
 	return availableFormatsVec[0];
 }
 
-static VkPresentModeKHR chooseSwapPresentMode(VkPresentModeKHR* availablePresentModesVec) 
+static VkPresentModeKHR chooseSwapPresentMode(VkPresentModeKHR* availablePresentModesVec, const VkPresentModeKHR preferredPresentMode) 
 {
 	for (int i = 0; i < vector_size(availablePresentModesVec); i++) {
-		if (availablePresentModesVec[i] == VK_PRESENT_MODE_MAILBOX_KHR) {
+		if (availablePresentModesVec[i] == preferredPresentMode) {
 			return VK_PRESENT_MODE_MAILBOX_KHR;
 		}
 	}
@@ -87,8 +87,8 @@ State createSwapChain(struct Renderer* renderer)
 {
 	struct SwapChainSupportDetails swapChainSupport = querySwapChainSupport(renderer->vkPhysicalDevice, renderer->vkSurface);
 
-	VkSurfaceFormatKHR surfaceFormat = chooseSwapSurfaceFormat(swapChainSupport.formatsVec);
-	VkPresentModeKHR presentMode = chooseSwapPresentMode(swapChainSupport.presentModesVec);
+	VkSurfaceFormatKHR surfaceFormat = chooseSwapSurfaceFormat(swapChainSupport.formatsVec, &renderer->config);
+	VkPresentModeKHR presentMode = chooseSwapPresentMode(swapChainSupport.presentModesVec, renderer->config.preferredSwapchainPresentMode);
 	VkExtent2D extent = chooseSwapExtent(renderer, swapChainSupport.capabilities);
 
 	uint32_t imageCount = swapChainSupport.capabilities.minImageCount + 1;
@@ -117,8 +117,6 @@ State createSwapChain(struct Renderer* renderer)
 		createInfo.pQueueFamilyIndices = queueFamilyIndices;
 	} else {
 		createInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
-		createInfo.queueFamilyIndexCount = 0; // Optional
-		createInfo.pQueueFamilyIndices = NULL; // Optional
 	}
 
 	createInfo.preTransform = swapChainSupport.capabilities.currentTransform;

@@ -10,24 +10,28 @@
 
 #define DEFAULT_RENDERER_CONFIG \
     (struct RendererConfig) {  \
-        .winTitle = "VulkanRenderer",   					\
-        .winInitWidth = 1280,   						\
-        .winInitHeight = 720,							\
-        .winResizable = GLFW_FALSE,						\
-        .winFocused = GLFW_TRUE,						\
-	.keyCallback = NULL, 							\
-	    									\
-	.appName = "VulkanRenderer", 						\
-	.appVersion = VK_MAKE_VERSION(1, 0, 0), 				\
-	.engineName = "NoEngine", 						\
-	.engineVersion = VK_MAKE_VERSION(1, 0, 0), 				\
-	.apiVersion = VK_API_VERSION_1_0,	 				\
-	.extraInstanceExtensions = NULL,	 				\
-	.extraInstanceExtensionsCount = 0,					\
-										\
-	.preferredPhysicalDeviceType = PHYSICAL_DEVICE_TYPE_AUTO,		\
-	.extraDeviceExtensions = NULL,						\
-	.extraDeviceExtensionsCount = 0						\
+        .winTitle = "VulkanRenderer",   						\
+        .winInitWidth = 1280,   							\
+        .winInitHeight = 720,								\
+        .winResizable = GLFW_FALSE,							\
+        .winFocused = GLFW_TRUE,							\
+	.keyCallback = NULL, 								\
+	    										\
+	.appName = "VulkanRenderer", 							\
+	.appVersion = VK_MAKE_VERSION(1, 0, 0), 					\
+	.engineName = "NoEngine", 							\
+	.engineVersion = VK_MAKE_VERSION(1, 0, 0), 					\
+	.apiVersion = VK_API_VERSION_1_0,	 					\
+	.extraInstanceExtensions = NULL,	 					\
+	.extraInstanceExtensionsCount = 0,						\
+											\
+	.preferredPhysicalDeviceType = PHYSICAL_DEVICE_TYPE_AUTO,			\
+	.extraDeviceExtensions = NULL,							\
+	.extraDeviceExtensionsCount = 0,						\
+	    										\
+	.preferredSwapchainSurfaceFormat = VK_FORMAT_B8G8R8_SRGB,			\
+	.preferredSwapchainSurfaceColorSpace = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR,	\
+	.preferredSwapchainPresentMode = VK_PRESENT_MODE_MAILBOX_KHR			\
     }
 
 struct RendererConfig {
@@ -52,6 +56,11 @@ struct RendererConfig {
 	PhysicalDeviceType	preferredPhysicalDeviceType; // PhysicalDeviceType enum in state.h
 	char**			extraDeviceExtensions;
 	uint32_t		extraDeviceExtensionsCount;
+
+	// Swap Chain
+	VkFormat		preferredSwapchainSurfaceFormat;
+	VkColorSpaceKHR		preferredSwapchainSurfaceColorSpace;
+	VkPresentModeKHR	preferredSwapchainPresentMode;
 };
 
 struct Renderer {

@@ -6,7 +6,6 @@ int main(int argc, char** argv)
 {
 	struct RendererConfig config = DEFAULT_RENDERER_CONFIG;
 	config.keyCallback = keyCallback;
-	config.preferredPhysicalDeviceType = PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU;
 
 	struct Renderer myRenderer;
 	if (initRenderer(&myRenderer, &config) != SUCCESS)

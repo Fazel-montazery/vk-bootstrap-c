@@ -12,7 +12,7 @@ void printState(State s)
 	case FAIL:
 		fprintf(stderr, "FAIL!\n");
 		break;
-		
+
 	case ERROR_GLFW_WINDOW_CREATION:
 		fprintf(stderr, "[Error] creating glfw window!\n");
 		break;
@@ -92,7 +92,7 @@ void printState(State s)
 	case ERROR_VULKAN_COMMAND_POOL_CREATION:
 		fprintf(stderr, "[Error] failed to create command pool!\n");
 		break;
-	
+
 	case ERROR_VULKAN_COMMAND_BUFFER_CREATION:
 		fprintf(stderr, "[Error] failed to create command buffer!\n");
 		break;

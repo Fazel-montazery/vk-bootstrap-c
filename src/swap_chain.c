@@ -55,7 +55,7 @@ static VkSurfaceFormatKHR chooseSwapSurfaceFormat(VkSurfaceFormatKHR* availableF
 	return availableFormatsVec[0];
 }
 
-static VkPresentModeKHR chooseSwapPresentMode(VkPresentModeKHR* availablePresentModesVec, const VkPresentModeKHR preferredPresentMode) 
+static VkPresentModeKHR chooseSwapPresentMode(VkPresentModeKHR* availablePresentModesVec, const VkPresentModeKHR preferredPresentMode)
 {
 	for (int i = 0; i < vector_size(availablePresentModesVec); i++) {
 		if (availablePresentModesVec[i] == preferredPresentMode) {
@@ -66,7 +66,7 @@ static VkPresentModeKHR chooseSwapPresentMode(VkPresentModeKHR* availablePresent
 	return VK_PRESENT_MODE_FIFO_KHR;
 }
 
-static VkExtent2D chooseSwapExtent(struct Renderer* renderer, VkSurfaceCapabilitiesKHR capabilities) 
+static VkExtent2D chooseSwapExtent(struct Renderer* renderer, VkSurfaceCapabilitiesKHR capabilities)
 {
 	if (capabilities.currentExtent.width != UINT32_MAX) {
 		return capabilities.currentExtent;

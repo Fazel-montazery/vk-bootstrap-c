@@ -136,7 +136,7 @@ State createVulkanInstance(struct Renderer* renderer)
 	createInfo.ppEnabledLayerNames = validationLayers;
 
 	populateDebugMessengerCreateInfo(&debugCreateInfo);
-        createInfo.pNext = (VkDebugUtilsMessengerCreateInfoEXT*) &debugCreateInfo;
+	createInfo.pNext = (VkDebugUtilsMessengerCreateInfoEXT*) &debugCreateInfo;
 #endif
 
 	createInfo.enabledExtensionCount = requiredExtensionCount;

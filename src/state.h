@@ -37,11 +37,11 @@ typedef enum {
 
 #ifndef NDEBUG
 void printState(State s);
-#define CHECK_STATE(state) do {         \
-        if (state != SUCCESS) {         \
-                printState(state);      \
-                return state;           \
-        }                               \
+#define CHECK_STATE(state) do {		\
+	if (state != SUCCESS) {		\
+		printState(state);	\
+		return state;		\
+	}				\
 } while(0)
 #else
 #define CHECK_STATE(state) do { } while(0)

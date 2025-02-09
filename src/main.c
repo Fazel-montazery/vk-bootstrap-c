@@ -12,12 +12,12 @@ int main(int argc, char** argv)
 		return FAIL;
 
 	runRenderer(&myRenderer);
-	
+
 	destroyRenderer(&myRenderer);
 	return SUCCESS;
 }
 
-void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) 
+void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
 	if (action == GLFW_PRESS) {
 		if (key == GLFW_KEY_ESCAPE || key == GLFW_KEY_Q) {

@@ -70,7 +70,7 @@ State initRenderer(struct Renderer* renderer, struct RendererConfig* config)
 	// Creating frame buffers
 	state = createFramebuffers(&r);
 	CHECK_STATE(state);
-	
+
 	// Creating the command pool
 	state = createCommandPool(&r);
 	CHECK_STATE(state);

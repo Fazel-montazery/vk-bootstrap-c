@@ -61,7 +61,7 @@ static int getDeviceScore(VkPhysicalDevice device, VkSurfaceKHR surface, char** 
 
 	bool swapChainAdequate = false;
 	struct SwapChainSupportDetails swapChainSupport = querySwapChainSupport(device, surface);
-    	swapChainAdequate = vector_size(swapChainSupport.formatsVec) && vector_size(swapChainSupport.presentModesVec);
+	swapChainAdequate = vector_size(swapChainSupport.formatsVec) && vector_size(swapChainSupport.presentModesVec);
 	destroySwapChainSupportDetails(&swapChainSupport);
 
 	if (!swapChainAdequate) {
@@ -170,8 +170,8 @@ State createLogicalDevice(struct Renderer* renderer)
 	createInfo.ppEnabledExtensionNames = (const char**) renderer->requiredDeviceExtensions;
 
 #ifndef NDEBUG
-    		createInfo.enabledLayerCount = validationLayerCount;
-    		createInfo.ppEnabledLayerNames = validationLayers;
+		createInfo.enabledLayerCount = validationLayerCount;
+		createInfo.ppEnabledLayerNames = validationLayers;
 #else
 		createInfo.enabledLayerCount = 0;
 #endif
@@ -182,7 +182,7 @@ State createLogicalDevice(struct Renderer* renderer)
 
 	vkGetDeviceQueue(renderer->vkDevice, indices.graphicsFamily, 0, &renderer->vkGraphicsQueue);
 	vkGetDeviceQueue(renderer->vkDevice, indices.presentFamily, 0, &renderer->vkPresentQueue);
-	
+
 	vector_free(renderer->requiredDeviceExtensions);
 	vector_free(queueCreateInfosVec);
 	vector_free(uniqueQueueFamiliesSet);

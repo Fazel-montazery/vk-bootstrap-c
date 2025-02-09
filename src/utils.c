@@ -1,6 +1,6 @@
 #include "utils.h"
 
-uint32_t clamp(uint32_t value, uint32_t min, uint32_t max) 
+uint32_t clamp(uint32_t value, uint32_t min, uint32_t max)
 {
 	if (value < min) {
 		return min;
@@ -11,7 +11,7 @@ uint32_t clamp(uint32_t value, uint32_t min, uint32_t max)
 	}
 }
 
-unsigned char* loadShaderSpv(const char* path, size_t* outLength) 
+unsigned char* loadShaderSpv(const char* path, size_t* outLength)
 {
 	if (!path) {
 		fprintf(stderr, "[shader src loading] Path is NULL\n");

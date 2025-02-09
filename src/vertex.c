@@ -21,7 +21,7 @@ void initBindingAttribDescriptionVertices()
 	attributeDescriptionsVertex2D[1].offset = offsetof(struct Vertex2D, color);
 }
 
-static State findMemoryType(struct Renderer* renderer, uint32_t typeFilter, VkMemoryPropertyFlags properties, uint32_t* result) 
+static State findMemoryType(struct Renderer* renderer, uint32_t typeFilter, VkMemoryPropertyFlags properties, uint32_t* result)
 {
 	VkPhysicalDeviceMemoryProperties memProperties;
 	vkGetPhysicalDeviceMemoryProperties(renderer->vkPhysicalDevice, &memProperties);

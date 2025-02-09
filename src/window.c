@@ -7,7 +7,7 @@ static int frameCount = 0;
 static char fps_str[20];
 #endif
 
-static void framebufferResizeCallback(GLFWwindow* window, int width, int height) 
+static void framebufferResizeCallback(GLFWwindow* window, int width, int height)
 {
 	struct Renderer* r = glfwGetWindowUserPointer(window);
 	r->framebufferResized = true;
